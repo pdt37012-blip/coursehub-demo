@@ -20,48 +20,62 @@ enrollments = [
 {"student_id": "22000001", "course_code": "INT2204"}
 ]
 
-for course in courses:
-    remaining = course["capacity"] - course["enrolled"]
-    print(course["code"], "- con", remaining, "cho")
-
 def find_course(course_code):
     for course in courses:
         if course["code"] == course_code:
             return course
-        return None
-    
-print(find_course("INT2204"))   
+    return None
 
-def can_enroll(student_id, course_code):
+
+def find_student(student_id):
+    for student in students:
+        if student["id"] == student_id:
+            return student
+    return None
+
+
+def enroll_student(student_id, course_code):
+
+    if find_student(student_id) is None:
+        return "Khong tim thay sinh vien"
+
     course = find_course(course_code)
     if course is None:
-        return False, "Hoc phan khong ton tai"
+        return "Khong tim thay hoc phan"
+
     if course["enrolled"] >= course["capacity"]:
-        return False, "Lop da du so luong"
+        return "Lop da du so luong"
+
     duplicated = any(
-        item["student_id"] == student_id and item["course_code"] == course_code
+        item["student_id"] == student_id
+        and item["course_code"] == course_code
         for item in enrollments
     )
+
     if duplicated:
-        return False, "Sinh vien da dang ky hoc phan nay"
-    return True, "Co the dang ky"
+        return "Sinh vien da dang ky hoc phan nay"
 
-print(can_enroll("22000002", "INT2204"))
+    enrollments.append({
+        "student_id": student_id,
+        "course_code": course_code
+    })
+
+    course["enrolled"] += 1
+
+    return "Dang ky thanh cong"
 
 
-try:
-    limit = int(input("Nhap so luong hoc phan muon hien thi: "))
-    print(courses[:limit])
-except ValueError:
-    print("So luong phai la so nguyen")
+print("1. Dang ky thanh cong:")
+print(enroll_student("22000002", "INT2204"))
 
-def search_courses(keyword):
-    normalized = keyword.strip().lower()
-    results = []
-    for course in courses:
-        code = course["code"].lower()
-        name = course["name"].lower()
-        if normalized in code or normalized in name:
-            results.append(course)
-    return results
-print(search_courses("web"))
+print("\n2. Dang ky trung:")
+print(enroll_student("22000001", "INT2204"))
+
+print("\n3. Lop day:")
+print(enroll_student("22000002", "INT2205"))
+
+print("\n4. Ma hoc phan khong ton tai:")
+print(enroll_student("22000002", "INT9999"))
+
+print("\n5. Ma sinh vien khong ton tai:")
+print(enroll_student("22000099", "INT2204"))
