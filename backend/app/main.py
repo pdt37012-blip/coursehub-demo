@@ -246,3 +246,16 @@ def delete_enrollment(student_id: str, class_section_id: str) -> Response:
             )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.get("/lecturers")
+def list_lecturers() -> list[dict[str, object]]:
+    sql = """
+        SELECT id, name
+        FROM lecturers
+        ORDER BY id ASC
+    """
+
+    with engine.connect() as connection:
+        rows = connection.execute(text(sql)).mappings().all()
+
+    return [dict(row) for row in rows]
