@@ -1,0 +1,277 @@
+{
+	"info": {
+		"_postman_id": "8b56c88a-cdd8-4b83-ae6b-a6d0a6331f03",
+		"name": "CourseHub API - Buoi 3",
+		"description": "Bo request thuc hanh FastAPI va PostgreSQL CourseHub.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/health"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Response la JSON', () => {",
+							"  pm.response.to.be.json;",
+							"});"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "02 - List courses",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/courses"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+							"pm.test('Co ba hoc phan', () => pm.expect(pm.response.json()).to.have.lengthOf(3));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "03 - Search courses",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses?q=web",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "web"
+						}
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+							"pm.test('Tim thay INT2204', () => pm.expect(pm.response.json().map(course => course.code)).to.eql(['INT2204']));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "04 - Course detail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/courses/INT2204"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+							"pm.test('Hoc phan co ba tin chi', () => pm.expect(pm.response.json().credits).to.eql(3));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "05 - Available sections",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/sections?available_only=true"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+							"pm.test('Chi con ba lop co cho', () => pm.expect(pm.response.json().map(section => section.class_id)).to.eql(['PY-01', 'WEB-01', 'WEB-02']));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "06 - Student enrollments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{base_url}}/students/22000001/enrollments"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+							"pm.test('Sinh vien co hai dang ky', () => pm.expect(pm.response.json()).to.have.lengthOf(2));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "07 - Create enrollment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"student_id\": \"22000004\",\n  \"class_section_id\": \"WEB-01\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/enrollments"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 201', () => pm.response.to.have.status(201));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "08 - Duplicate enrollment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"student_id\": \"22000004\",\n  \"class_section_id\": \"WEB-01\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/enrollments"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 409', () => pm.response.to.have.status(409));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "09 - Invalid enrollment body",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"student_id\": \"123\",\n  \"class_section_id\": \"WEB-01\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/enrollments"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 422', () => pm.response.to.have.status(422));"
+						]
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "10 - Delete enrollment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{base_url}}/enrollments/22000004/WEB-01"
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code la 204', () => pm.response.to.have.status(204));",
+							"pm.test('Response body rong', () => pm.expect(pm.response.text()).to.eql(''));"
+						]
+					}
+				}
+			],
+			"response": []
+		}
+	]
+}
