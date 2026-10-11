@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/sections?available_only=true"
+method: GET
+queryParams:
+  available_only: "true"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code la 200', () => pm.response.to.have.status(200));
+      pm.test('Chi con ba lop co cho', () => pm.expect(pm.response.json().map(section => section.class_id)).to.eql(['PY-01', 'WEB-01', 'WEB-02']));
+    language: text/javascript
+order: 5000

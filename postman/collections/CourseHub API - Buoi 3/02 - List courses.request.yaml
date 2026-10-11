@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/courses"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code la 200', () => pm.response.to.have.status(200));
+      pm.test('Co ba hoc phan', () => pm.expect(pm.response.json()).to.have.lengthOf(3));
+    language: text/javascript
+order: 2000
