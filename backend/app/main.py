@@ -259,3 +259,49 @@ def list_lecturers() -> list[dict[str, object]]:
         rows = connection.execute(text(sql)).mappings().all()
 
     return [dict(row) for row in rows]
+
+
+@app.get("/sections/{section_id}")
+def get_section(section_id: str) -> dict[str, object]:
+    sql = """
+        SELECT
+            cs.id AS class_id,
+            c.code AS course_code,
+            c.name AS course_name,
+            sm.name AS semester,
+            l.name AS lecturer_name,
+            cs.capacity,
+            COUNT(e.student_id) AS enrolled,
+            cs.capacity - COUNT(e.student_id) AS remaining
+        FROM class_sections AS cs
+        JOIN courses AS c
+            ON c.code = cs.course_code
+        JOIN semesters AS sm
+            ON sm.code = cs.semester_code
+        JOIN lecturers AS l
+            ON l.id = cs.lecturer_id
+        LEFT JOIN enrollments AS e
+            ON e.class_section_id = cs.id
+        WHERE cs.id = :section_id
+        GROUP BY
+            cs.id,
+            c.code,
+            c.name,
+            sm.name,
+            l.name,
+            cs.capacity
+    """
+
+    with engine.connect() as connection:
+        row = connection.execute(
+            text(sql),
+            {"section_id": section_id},
+        ).mappings().first()
+
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Khong tim thay lop hoc phan",
+        )
+
+    return dict(row)
