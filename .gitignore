@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.envpuw
+.env
+.postman/
+.vscode/
+.coursehub-demo/
