@@ -3,6 +3,9 @@ __pycache__/
 .venv/
 .envpuw
 .env
+.env.local
+node_modules/
+dist/
 .postman/
 .vscode/
 .coursehub-demo/
