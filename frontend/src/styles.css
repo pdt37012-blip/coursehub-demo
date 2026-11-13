@@ -51,7 +51,15 @@ input:not([type="checkbox"]) {
   min-width: 0;
 }
 
+select {
+  border: 1px solid #9dacbd;
+  border-radius: 7px;
+  padding: 9px 11px;
+  font: inherit;
+}
+
 input:focus, button:focus-visible { outline: 3px solid #83b6e8; outline-offset: 2px; }
+select:focus { outline: 3px solid #83b6e8; outline-offset: 2px; }
 
 button {
   border: 1px solid #20588a;
@@ -76,6 +84,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
 .filters > label:first-child { width: 100%; font-size: 13px; }
 .filters input:not([type="checkbox"]) { flex: 1; width: 150px; }
+.filters select { flex: 1; min-width: 180px; }
 .check { display: flex; gap: 6px; align-items: center; font-size: 13px; }
 .table-scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -93,6 +102,7 @@ small { color: #718094; font-size: 11px; }
 .enrollments { padding: 0; list-style: none; margin: 0; }
 .enrollments li { padding: 14px 0; border-bottom: 1px solid #e2e8f0; }
 .enrollments button { margin-top: 9px; }
+.pagination { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
 footer { color: #63738a; font-size: 12px; padding: 3px 4px 18px; }
 
 @media (max-width: 900px) {

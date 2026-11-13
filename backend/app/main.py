@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+from typing import Literal
 from fastapi import FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -367,6 +368,7 @@ def get_section(section_id: str) -> dict[str, object]:
 def list_enrollment_events(
     student_id: str | None = None,
     event_type: str | None = None,
+    dataset: Literal["demo", "performance"] | None = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ) -> list[dict[str, object]]:
@@ -379,6 +381,9 @@ def list_enrollment_events(
     if event_type is not None:
         conditions.append("event_type = :event_type")
         parameters["event_type"] = event_type
+    if dataset is not None:
+        conditions.append("dataset = :dataset")
+        parameters["dataset"] = dataset
 
     sql = """
         SELECT id, student_id, class_section_id, event_type,

@@ -3,6 +3,10 @@ import { api } from "./api.js";
 import Notice from "./components/Notice.jsx";
 import SectionTable from "./components/SectionTable.jsx";
 import EnrollmentList from "./components/EnrollmentList.jsx";
+import StudentForm from "./components/StudentForm.jsx";
+import EnrollmentHistory from "./components/EnrollmentHistory.jsx";
+
+const PRACTICE_COURSE_CODES = ["INT2204", "INT2205", "INT2206"];
 
 export default function App() {
   const [draftId, setDraftId] = useState("22000004");
@@ -11,6 +15,7 @@ export default function App() {
   const [sections, setSections] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [search, setSearch] = useState("");
+  const [courseCode, setCourseCode] = useState("");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -89,7 +94,6 @@ export default function App() {
     } catch (err) {
       setNotice({ kind: "error", text: err.message });
     } finally {
-      // Đọc lại CSDL kể cả sau lỗi; không tự cộng/trừ số chỗ ở giao diện.
       setLoading(true);
       setRefresh((value) => value + 1);
       setBusy(false);
@@ -112,6 +116,7 @@ export default function App() {
         `${row.class_id} ${row.course_code} ${row.course_name}`
           .toLowerCase()
           .includes(keyword) &&
+        (!courseCode || row.course_code === courseCode) &&
         (!onlyAvailable || row.remaining > 0),
     );
 
@@ -130,27 +135,14 @@ export default function App() {
       </p>
       <section className="panel">
         <h2>1. Chọn sinh viên</h2>
-        <form className="student-form" onSubmit={chooseStudent}>
-          <label htmlFor="student-id">Mã sinh viên</label>
-          <input
-            id="student-id"
-            value={draftId}
-            maxLength={8}
-            required
-            inputMode="numeric"
-            onChange={(e) => setDraftId(e.target.value)}
-            disabled={busy}
-          />
-          <button type="submit" disabled={busy}>Xem đăng ký</button>
-          <button
-            type="button"
-            className="secondary"
-            disabled={busy || loading}
-            onClick={() => setRefresh((value) => value + 1)}
-          >
-            Tải lại dữ liệu
-          </button>
-        </form>
+        <StudentForm
+          value={draftId}
+          onChange={setDraftId}
+          onSubmit={chooseStudent}
+          disabled={busy}
+          loading={loading}
+          onRefresh={() => setRefresh((value) => value + 1)}
+        />
         <p className="muted">
           Dữ liệu đang xem: <strong>{studentId}</strong>. Mã mẫu: 22000001–22000004.
         </p>
@@ -171,6 +163,21 @@ export default function App() {
                 placeholder="Ví dụ: web"
                 onChange={(e) => setSearch(e.target.value)}
               />
+              <label htmlFor="course-filter">Học phần</label>
+              <select
+                id="course-filter"
+                value={courseCode}
+                onChange={(event) => setCourseCode(event.target.value)}
+              >
+                <option value="">Tất cả học phần</option>
+                {courses
+                  .filter((course) => PRACTICE_COURSE_CODES.includes(course.code))
+                  .map((course) => (
+                    <option key={course.code} value={course.code}>
+                      {course.code} · {course.name}
+                    </option>
+                  ))}
+              </select>
               <label className="check">
                 <input
                   type="checkbox"
@@ -198,6 +205,13 @@ export default function App() {
             />
           </section>
         </div>
+      )}
+      {!loading && !error && (
+        <EnrollmentHistory
+          key={studentId}
+          studentId={studentId}
+          refresh={refresh}
+        />
       )}
       <footer>Số chỗ và đăng ký được đọc từ API; Backend quyết định tính hợp lệ.</footer>
     </main>
