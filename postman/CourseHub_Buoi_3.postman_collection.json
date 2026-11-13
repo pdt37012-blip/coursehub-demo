@@ -272,6 +272,101 @@
 				}
 			],
 			"response": []
-		}
+		},
+				{
+					"name": "11 - Enrollment events (has data)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/enrollment-events?student_id=22000002&event_type=CREATED&skip=0&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"enrollment-events"
+							],
+							"query": [
+								{
+									"key": "student_id",
+									"value": "22000002"
+								},
+								{
+									"key": "event_type",
+									"value": "CREATED"
+								},
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+									"pm.test('Co lich su dang ky', () => pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty);",
+									"pm.test('Ket qua dung bo loc', () => pm.expect(pm.response.json().every(event => event.student_id === '22000002' && event.event_type === 'CREATED')).to.eql(true));"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "12 - Enrollment events (no data)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/enrollment-events?student_id=99999999&event_type=CREATED&skip=0&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"enrollment-events"
+							],
+							"query": [
+								{
+									"key": "student_id",
+									"value": "99999999"
+								},
+								{
+									"key": "event_type",
+									"value": "CREATED"
+								},
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code la 200', () => pm.response.to.have.status(200));",
+									"pm.test('Khong co lich su', () => pm.expect(pm.response.json()).to.eql([]));"
+								]
+							}
+						}
+					],
+					"response": []
+				}
 	]
 }
